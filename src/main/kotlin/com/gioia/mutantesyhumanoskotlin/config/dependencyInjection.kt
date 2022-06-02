@@ -10,55 +10,35 @@ import com.gioia.mutantesyhumanoskotlin.services.stats.StatsService
 import com.mongodb.MongoClient
 import com.mongodb.MongoClientOptions
 import com.mongodb.MongoClientURI
-import com.mongodb.client.MongoDatabase
 import org.kodein.di.DI
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 
-
 val di = DI {
-    bindSingleton<StatsService> {MutantAndHumanStatsService()}
+    bindSingleton<StatsService> {MutantAndHumanStatsService(instance())}
     bindSingleton<MutantService> {MutantVerificationService()}
     bindSingleton<ApiService> { ApiRestService(instance()) }
     bindSingleton {ApiRestController(instance(), instance(), instance())}
     bindSingleton {
-        val mongoUri = StringBuffer("mongodb+srv://")
-        //mongoUri.append(prop.getProperty(AppMongoClient.MONGO_USER)) //fixme variables de entorno.
-        mongoUri.append(":")
-        //mongoUri.append(prop.getProperty(AppMongoClient.MONGO_PASSWORD)) //fixme variables de entorno.
-        mongoUri.append("@")
-        //mongoUri.append(prop.getProperty(AppMongoClient.MONGO_HOST)) //fixme variables de entorno.
-        mongoUri.append("/")
-        // mongoUri.append(AppMongoClient.databaseName) //fixme variables de entorno.
-        mongoUri.append("?retryWrites=true&w=majority")
+        val mongoUser: String? = PropertiesReader.getProperty(Property.MONGO_USER.value)
+        val mongoPassword: String? = PropertiesReader.getProperty(Property.MONGO_PASSWORD.value)
+        val mongoUri = StringBuffer("mongodb://")
+
+        if(listOf(mongoUser, mongoPassword).all{ it != null}) {
+            mongoUri.append("$mongoUser:$mongoPassword@")
+        }
+
+        mongoUri.append(PropertiesReader.getProperty(Property.MONGO_HOST.value) ?: "localhost")
+        .append("/")
+        .append(PropertiesReader.getProperty(Property.MONGO_DATABASE_NAME.value)?: "mutantApp")
+        //.append("?retryWrites=true&w=majority")
 
         val clientOptions = MongoClientOptions.Builder()
-        // La cantidad de conexiones que tendrá el pool de mongodb.
-        // La cantidad de conexiones que tendrá el pool de mongodb.
-        clientOptions.minConnectionsPerHost(10)
-        clientOptions.connectionsPerHost(2990)
-        // Tiempo de espera de 60 seg como máximo.
-        // Tiempo de espera de 60 seg como máximo.
-        clientOptions.maxConnectionIdleTime(60000)
-        MongoClient(MongoClientURI(mongoUri.toString(), clientOptions))
-            .getDatabase("mongo") //fixme
-    }
-    /*bindSingleton<DatabaseGenerator> {DatabaseGeneratorImpl(instance(), instance())}
-    bindSingleton<CountryRepository> {CountryRepositoryImpl(instance())}
-    bindSingleton<ConfigurationRepository> {ConfigurationRepositoryImpl(instance())}
-    bindSingleton<PlayerService> {PlayerServiceImpl(instance())}
-    bindSingleton<MessageService> {MessageServiceImpl(instance())}
-    //bindSingleton<StateKeeper> {()}
-    bindSingleton {AudioPlayerComponent()}
-    bindSingleton {StationsViewModel(instance(), instance(), instance())}
+        .minConnectionsPerHost(PropertiesReader.getProperty(Property.MONGO_MIN_CONNECTIONS.value)?.toInt() ?: 10)
+        .connectionsPerHost(PropertiesReader.getProperty(Property.MONGO_MAX_CONNECTIONS.value)?.toInt() ?: 2990)
+        .maxConnectionIdleTime(PropertiesReader.getProperty(Property.MONGO_TIMEOUT.value)?.toInt() ?: 30000)
 
-    //val bundle: ResourceBundle = ResourceBundle.getBundle("Messages")
-    bindSingleton<Nitrite>{
-        Nitrite
-            .builder()
-            .filePath(".${File.separator}file.db")
-            .openOrCreate()
+        MongoClient(MongoClientURI(mongoUri.toString(), clientOptions))
+            .getDatabase(PropertiesReader.getProperty(Property.MONGO_DATABASE_NAME.value) ?: "mutantApp")
     }
-    bindConstant(tag = "defaultHeight") {500}
-    bindConstant(tag = "defaultWidth") {900}*/
 }

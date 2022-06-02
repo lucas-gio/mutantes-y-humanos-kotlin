@@ -65,8 +65,8 @@ class ApiRestService(
 			mongoDatabase
 				.getCollection(Stat.collectionName)
 				.updateOne(
-					Filters.eq(Stat._id, Stat.id),
-					Updates.inc((if(isMutant) Stat._mutantsQuantity else Stat._humansQuantity), 1),
+					Filters.eq(Stat.fieldId, Stat.id),
+					Updates.inc((if(isMutant) Stat.fieldMutantsQuantity else Stat.fieldHumansQuantity), 1),
 					UpdateOptions().upsert(true)
 				)
 		}

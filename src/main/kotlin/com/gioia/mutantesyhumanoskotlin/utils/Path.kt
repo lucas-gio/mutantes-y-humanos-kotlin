@@ -1,4 +1,4 @@
-package com.gioia.mutantesyhumanoskotlin.utils;
+package com.gioia.mutantesyhumanoskotlin.utils
 
 /**
  * Clase destinada a mantener las rutas correspondientes a cada recurso.
@@ -6,7 +6,7 @@ package com.gioia.mutantesyhumanoskotlin.utils;
 enum class Path(
     val value: String
 ) {
-    MUTANT("/mutant/"),
-    STATS("/stats/"),
+    MUTANT("mutant"),
+    STATS("stats"),
     INDEX("/"),
 }

@@ -1,4 +1,4 @@
-package com.gioia.mutantesyhumanoskotlin.services.stats;
+package com.gioia.mutantesyhumanoskotlin.services.stats
 
 /**
  * Interfaz destinada a estadísticas.

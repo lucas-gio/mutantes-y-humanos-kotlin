@@ -2,23 +2,24 @@ package com.gioia.mutantesyhumanoskotlin.services.stats
 
 import com.gioia.mutantesyhumanoskotlin.domain.MutantAndHumanStat
 import com.gioia.mutantesyhumanoskotlin.domain.Stat
-import com.gioia.mutantesyhumanoskotlin.services.mongo.AppMongoClient
+import com.mongodb.client.MongoDatabase
 import com.mongodb.client.model.Filters.eq
 import org.bson.Document
 import org.slf4j.LoggerFactory
 import java.math.BigDecimal
 import java.math.RoundingMode
 
-class MutantAndHumanStatsService : StatsService{
+class MutantAndHumanStatsService(
+	private val mongoDatabase: MongoDatabase
+) : StatsService{
 	private var logger = LoggerFactory.getLogger(MutantAndHumanStatsService::class.java)
 
 	override fun getJsonStats(): String{
 		try {
-			val statCountersList = AppMongoClient
-				.getDb()
+			val statCountersList = mongoDatabase
 				.getCollection(Stat.collectionName)
 				.find(
-					eq(Stat._id, Stat.id)
+					eq(Stat.fieldId, Stat.id)
 				)
 				.first()
 
@@ -26,10 +27,10 @@ class MutantAndHumanStatsService : StatsService{
 			var mutantCount = 0
 			var humanCount = 0
 
-			if(statCountersList.iterator().hasNext()){
-				statCounters = statCountersList.iterator().next()
-				mutantCount = statCounters.getInteger(Stat._mutantsQuantity, 0)
-				humanCount = statCounters.getInteger(Stat._humansQuantity, 0)
+			if(statCountersList?.iterator()?.hasNext() == true){
+				statCounters = statCountersList.iterator().next() as Document
+				mutantCount = statCounters.getInteger(Stat.fieldMutantsQuantity, 0)
+				humanCount = statCounters.getInteger(Stat.fieldHumansQuantity, 0)
 			}
 
 			var ratio = BigDecimal(mutantCount)

@@ -4,13 +4,15 @@ import com.gioia.mutantesyhumanoskotlin.exceptions.RestMutantValidationException
 import com.gioia.mutantesyhumanoskotlin.services.api.ApiService
 import com.gioia.mutantesyhumanoskotlin.services.mutant.MutantService
 import com.gioia.mutantesyhumanoskotlin.services.stats.StatsService
-import com.gioia.mutantesyhumanoskotlin.utils.Path
 import com.google.gson.JsonSyntaxException
+import org.http4k.core.Request
+import org.http4k.core.Response
+import org.http4k.core.Status.Companion.BAD_REQUEST
+import org.http4k.core.Status.Companion.FORBIDDEN
+import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
+import org.http4k.core.Status.Companion.OK
+import org.http4k.core.Status.Companion.UNPROCESSABLE_ENTITY
 import org.slf4j.LoggerFactory
-import spark.Request
-import spark.Response
-import spark.Spark
-import java.net.HttpURLConnection
 
 /**
  * Controlador dedicado a los ingresos al sistema por api rest.
@@ -20,93 +22,60 @@ class ApiRestController(
 	private val mutantService: MutantService,
 	private val statsService: StatsService
 ) {
-	init {
-		initializeRoutes()
-	}
-
-	/**
-	 * Inicializa el servidor y mapea rutas a recursos.
-	 */
-	private fun initializeRoutes() {
-		Spark.port(serverPort)
-		val maxThreads = 8 //fixme variable de entorno
-		val minThreads = 2//fixme variable de entorno
-		val idleTimeoutMs = 30000//fixme variable de entorno
-		Spark.threadPool(maxThreads, minThreads, idleTimeoutMs)
-		Spark.staticFiles.location("/public") // Para loader.io
-		Spark.post(
-			Path.MUTANT.toString()
-		) { request: Request, response: Response -> processMutantPost(request, response) }
-		Spark.get(
-			Path.STATS.toString()
-		) { request: Request, response: Response -> processStats(request, response) }
-
-		// Este caso específico es para el monitoreo de amazon beanstalk.
-		Spark.get(Path.INDEX.toString()) { _, response: Response ->
-			response.status(HttpURLConnection.HTTP_OK)
-			""
-		}
-	}
-
 	/**
 	 * Procesa el ingreso de adn para verificar si es un humano o mutante.
 	 * En caso de ser mutante o humano almacena un incremento para visualizarlo
 	 * posteriormente como estadística.
 	 * @param request El pedido del cliente.
-	 * @param response La respuesta.
 	 * @return Un cuerpo vacío y un estado http acorde al resultado obtenido.
 	 */
-	private fun processMutantPost(request: Request, response: Response): String {
+	fun processMutantPost(request: Request): Response {
+		var response: Response
 		try {
-			val dnasArray: Array<String> = apiService.parseReceivedDna(request.body())
+			val dnasArray = apiService.parseReceivedDna(request.body.toString())
 			apiService.validateDnaReceived(dnasArray)
-			val isMutant: Boolean = mutantService.isMutant(dnasArray)
+
+			val isMutant = mutantService.isMutant(dnasArray)
 			apiService.saveDnaReceived(dnasArray, isMutant)
-			if (isMutant) {
-				response.status(HttpURLConnection.HTTP_OK)
-			} else {
-				response.status(HttpURLConnection.HTTP_FORBIDDEN)
-			}
+			response = Response(if (isMutant) OK else FORBIDDEN)
 			apiService.saveStat(isMutant)
-		} catch (e: RestMutantValidationException) {
-			if (logger.isInfoEnabled) {
-				logger.info("Se detectó un error de validación sobre los adn obtenidos." + e.message)
-			}
-			// Error de entidad no procesable, en este caso por fallo de validación (no existe en HttpURLConnection).
-			response.status(422)
-		} catch (e: JsonSyntaxException) {
-			if (logger.isInfoEnabled) {
-				logger.info("Se detectó un error de sintaxis en el mensaje obtenido. " + e.message)
-			}
-			response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-		} catch (e: Exception) {
-			logger.error("Ocurrió un error al procesar el ingreso de adn via rest.", e)
-			response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
 		}
-		return ""
+		catch (e: RestMutantValidationException) {
+			logger.atInfo().log("Se detectó un error de validación sobre los adn obtenidos.$e.message")
+			// Error de entidad no procesable, en este caso por fallo de validación (no existe en HttpURLConnection).
+			response = Response(UNPROCESSABLE_ENTITY)
+		}
+		catch (e: JsonSyntaxException) {
+			logger.atInfo().log("Se detectó un error de sintaxis en el mensaje obtenido. $e.message")
+			response = Response(BAD_REQUEST)
+		}
+		catch (e: Exception) {
+			logger.error("Ocurrió un error al procesar el ingreso de adn via rest.", e)
+			response = Response(INTERNAL_SERVER_ERROR)
+		}
+
+		return response
 	}
 
 	/**
 	 * Otorga las estadísticas de conteo de mutantes y humanos, junto con su relación.
-	 * @param request El pedido del cliente.
-	 * @param response La respuesta.
 	 * @return Un json con las estadísticas solicitadas.
 	 */
-	private fun processStats(request: Request, response: Response): String {
-		var result: String
-		try {
-			result = statsService.getJsonStats()
-			response.status(HttpURLConnection.HTTP_OK)
-		} catch (e: Exception) {
-			logger.error("Ocurrió un error al generar las estadísticas a presentar.", e)
-			response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
-			result = "Ocurrió un error. Por favor, verifique el log."
+	fun processStats(): Response {
+		val response = try {
+			Response(OK).body(
+				statsService.getJsonStats()
+			)
 		}
-		return result
+		catch (e: Exception) {
+			logger.error("Ocurrió un error al generar las estadísticas a presentar.", e)
+			Response(INTERNAL_SERVER_ERROR).body("Ocurrió un error. Por favor, verifique el log.")
+		}
+
+		return response
 	}
 
 	companion object {
 		private val logger = LoggerFactory.getLogger(ApiRestController::class.java)
-		private const val serverPort = 5000 // fixme: En variable de entorno
 	}
 }

@@ -8,7 +8,7 @@ object Stat {
 
     // Sólo habrá un documento.
     var id = "1"
-    var _id = "_id"
-    var _mutantsQuantity = "mutantsQuantity"
-    var _humansQuantity = "humansQuantity"
+    var fieldId = "_id"
+    var fieldMutantsQuantity = "mutantsQuantity"
+    var fieldHumansQuantity = "humansQuantity"
 }

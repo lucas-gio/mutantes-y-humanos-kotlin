@@ -6,6 +6,19 @@ import java.util.regex.Pattern
 
 class MutantVerificationService: MutantService {
     private var logger = LoggerFactory.getLogger(MutantVerificationService::class.java)
+    /**
+     * Una expresión regular con aquellos valores considerados como propios de un mutante.
+     * De esta manera, en caso de modificarse el patrón, no es necesario modificar el método de verificación verify.
+     * Notar que hay diferenciación de mayúscula-minúscula, es decir aaaa no es válido pero sí lo es AAAA ya que el
+     * requerimiento especifica valores concretos.
+     *
+     * Detalle de la expresión: un caracter cero o más veces; A, T, C, G, alguno de ellos repetido cuatro veces;
+     * y al final un caracter cero o más veces.
+     */
+    private val mutantRegex = "(.*A{4}|T{4}|C{4}|G{4}.*)"
+
+    //Determina cuantas letras deberán tenerse en cuenta para verificar si el ser es mutante o no.
+    private val quantityOfLettersToCheck = 4
 
     override fun isMutant(dna: Array<String>): Boolean {
         var isMutant = false
@@ -19,7 +32,7 @@ class MutantVerificationService: MutantService {
         }
         catch (e: MutantDetectedException){
             isMutant = true
-            if(logger.isInfoEnabled) logger.info("Se detectó el adn ${e.getMessage()} como propio de un mutante.")
+            if(logger.isInfoEnabled) logger.info("Se detectó el adn ${e.message} como propio de un mutante.")
         }
         catch (e: Exception){
             logger.error("Ocurrió un error al procesar el método de verificación de mutantes.", e)
@@ -33,7 +46,7 @@ class MutantVerificationService: MutantService {
      * Verifica si el adn corresponde con el de un mutante.
      * @param dnaArray Un array con el adn del ser a verificar.
      */
-    private fun verify(dnaArray: Array<String>){
+    fun verify(dnaArray: Array<String>){
         dnaArray.forEach {
             verify(it)
         }
@@ -46,7 +59,7 @@ class MutantVerificationService: MutantService {
      */
     private fun verify(dna: String){
         try {
-            if (Pattern.compile(getMutantRegex()).matcher(dna).find()) {
+            if (Pattern.compile(mutantRegex).matcher(dna).find()) {
                 throw MutantDetectedException(dna)
             }
         }
@@ -103,17 +116,17 @@ class MutantVerificationService: MutantService {
         var diagonalResult: StringBuffer
 
         try {
-            var rowsQuantity = dnaArray.size
-            var columnsQuantity = dnaArray.first().length
+            val rowsQuantity = dnaArray.size
+            val columnsQuantity = dnaArray.first().length
 
             // Por cada columna de derecha a izquierda
-            for (var column = columnsQuantity - 1; column >= 0; column--) {
+            for (column in (columnsQuantity - 1) downTo 0) {
                 diagonalResult = StringBuffer()
 
                 // Por cada fila, de arriba hacia abajo
                 for (row in 0 until rowsQuantity) {
                     if ((column + row) < columnsQuantity) {
-                        diagonalResult.append(dnaArray[row].charAt(column + row))
+                        diagonalResult.append(dnaArray[row][(column + row)])
                     } else {
                         break
                     }
@@ -122,7 +135,7 @@ class MutantVerificationService: MutantService {
                 // Se tienen en cuenta aquellas diagonales de un tamaño igual o mayor al de la cantidad de
                 // letras a verificar. Por ej, si la diagonal es T, G, C, y la cantidad a verificar es 4 (por ej. GGGG)
                 // generaría consumo de tiempo de procesamiento.
-                if (diagonalResult.length() >= quantityOfLettersToCheck()) {
+                if (diagonalResult.length >= quantityOfLettersToCheck) {
                     verify(diagonalResult.toString())
                 }
             }
@@ -133,11 +146,16 @@ class MutantVerificationService: MutantService {
             for (i in 1 until rowsQuantity) {
                 diagonalResult = StringBuffer()
 
-                for (var j = i, columna = 0; ((j < rowsQuantity) && (columna < columnsQuantity)); j++, columna++) {
+                var j = i
+                var columna = 0
+
+                while (((j < rowsQuantity) && (columna < columnsQuantity))){
                     diagonalResult.append(dnaArray[j][columna])
+                    j++
+                    columna++
                 }
 
-                if (diagonalResult.length() >= quantityOfLettersToCheck()) {
+                if (diagonalResult.length >= quantityOfLettersToCheck) {
                     verify(diagonalResult.toString())
                 }
             }
@@ -150,27 +168,4 @@ class MutantVerificationService: MutantService {
             throw e
         }
     }
-
-    /**
-     * Retorna una expresión regular con aquellos valores considerados como propios de un mutante.
-     * De esta manera, en caso de modificarse el patrón, no es necesario modificar el método de verificación verify.
-     * Notar que hay diferenciación de mayúscula-minúscula, es decir aaaa no es válido pero sí lo es AAAA ya que el
-     * requerimiento especifica valores concretos.
-     *
-     * Detalle de la expresión: un caracter cero o más veces; A, T, C, G, alguno de ellos repetido cuatro veces;
-     * y al final un caracter cero o más veces.
-     * @return String con la expresión regular.
-     */
-    private fun getMutantRegex(): String{
-        return "(.{0,}A{4}|T{4}|C{4}|G{4}.{0,})"
-    }
-
-    /**
-     * Determina cuantas letras deberán tenerse en cuenta para verificar si el ser es mutante o no.
-     * @return Un entero con el valor correspondiente.
-     */
-    private fun quantityOfLettersToCheck(): Int {
-        return 4
-    }
-
 }

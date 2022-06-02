@@ -1,20 +1,15 @@
-package com.gioia.services.api
+package com.gioia.mutantesyhumanoskotlin.api
 
-import com.application.domain.DnaReceived
-import com.application.domain.Stat
-import com.application.exceptions.RestMutantValidationException
-import com.application.services.mongo.AppMongoClient
-import com.mongodb.BasicDBObject
-import org.bson.Document
-import spock.lang.Specification
+import com.gioia.mutantesyhumanoskotlin.services.api.ApiRestService
 
 /**
  * Pruebas de relacionadas a la implementación de ApiRestService.
  */
-class ApiRestServiceTest extends Specification{
-    ApiRestService apiRestService = new ApiRestService()
-
-    def "Se verifica que al obtener un json con el adn el el cuerpo de un mensaje, se interprete correctamente como array"(){
+class ApiRestServiceTest(
+    private val apiRestService: ApiRestService
+){
+/*
+    fun `Se verifica que al obtener un json con el adn el el cuerpo de un mensaje, se interprete correctamente como array`(){
         when: "Se envía cuatro mensajes con adn válido"
         String[] mutant1 = apiRestService.parseReceivedDna('{"dna":["ATGCGA","CAGTGC","TTATGT","AGAAGG","CCCCTA","TCACTG"]}')
         String[] mutant2 = apiRestService.parseReceivedDna('{"dna":["ATGCGA","CAGTGC","GTTTTT","AGACGG","GCGTCA","TCACTG"]}')
@@ -51,7 +46,7 @@ class ApiRestServiceTest extends Specification{
         mutant4[5] == "TCACTG"
     }
 
-    def "Se prueba que se almacenen correctamente los adn con los datos requeridos para su guardado"(){
+    fun `Se prueba que se almacenen correctamente los adn con los datos requeridos para su guardado`(){
         given: "Una colección de adn vacía"
         cleanAllDnaCollection()
 
@@ -82,7 +77,7 @@ class ApiRestServiceTest extends Specification{
         storedDnas.size() == 2
 
         and: "Tiene un id, y un adn con 6 elementos"
-        storedDnas.find{Document it-> it.isMutant == false}._id != null
+        storedDnas.find{Document it-> it.isMutant == false}.fieldId != null
         storedDnas.find{Document it-> it.isMutant == false}.dna != null
         storedDnas.find{Document it-> it.isMutant == false}.dna.size() == 6
         storedDnas.find{Document it-> it.isMutant == false}.dna.containsAll( [
@@ -94,7 +89,7 @@ class ApiRestServiceTest extends Specification{
                                 "TCACTG"
                 ] )
 
-        storedDnas.find{Document it-> it.isMutant == true}._id != null
+        storedDnas.find{Document it-> it.isMutant == true}.fieldId != null
         storedDnas.find{Document it-> it.isMutant == true}.dna != null
         storedDnas.find{Document it-> it.isMutant == true}.dna.size() == 6
         storedDnas.find{Document it-> it.isMutant == true}.dna.containsAll([
@@ -110,12 +105,12 @@ class ApiRestServiceTest extends Specification{
         cleanAllDnaCollection()
     }
 
-    def "Se verifica que el método validInputRegex() retorne la expresión regular esperada"(){
+    fun `Se verifica que el método validInputRegex() retorne la expresión regular esperada"(){
         expect:"Al llamar al método se obtiene el valor esperado"
         apiRestService.validInputRegex() == '^([ATCG]{1,})$'
     }
-
-    def "Se verifica que ante un ingreso de valores inválidos de adn falle el validador"(){
+@Test
+    fun `Se verifica que ante un ingreso de valores inválidos de adn falle el validador`(){
         when: "Se valida un adn null"
         String [] adn = null
         apiRestService.validateDnaReceived(adn)
@@ -144,8 +139,8 @@ class ApiRestServiceTest extends Specification{
         then: "Se obtiene una excepción de validación"
         thrown(RestMutantValidationException)
     }
-
-    def "Se prueba que el método que almacena incrementos en stats funcione incrementando mutantes cuando recibe mutantes, y humanos en caso contrario; Además de ser un solo registro"(){
+@Test
+    fun `Se prueba que el método que almacena incrementos en stats funcione incrementando mutantes cuando recibe mutantes, y humanos en caso contrario; Además de ser un solo registro`(){
         given: "La colección de estadísticas vacías"
         cleanStats();
 
@@ -165,8 +160,8 @@ class ApiRestServiceTest extends Specification{
         statDocuments.size() == 1
 
         and: "Tiene los valores esperados"
-        (statDocuments.first() as Document).get(Stat._mutantsQuantity) == 50
-        (statDocuments.first() as Document).get(Stat._humansQuantity) == 100
+        (statDocuments.first() as Document).get(Stat.fieldMutantsQuantity) == 50
+        (statDocuments.first() as Document).get(Stat.fieldHumansQuantity) == 100
 
         cleanup: "Se elimina la colección de estadísticas utilizada."
         cleanStats();
@@ -175,14 +170,16 @@ class ApiRestServiceTest extends Specification{
     /**
      * Borra toda la colección dna received
      */
-    private void cleanAllDnaCollection(){
+    private fun cleanAllDnaCollection(){
         AppMongoClient.getDb().getCollection(DnaReceived.collectionName).deleteMany(new BasicDBObject())
     }
 
     /**
      * Borra toda la colección stats.
      */
-    private void cleanStats(){
+    private fun cleanStats(){
         AppMongoClient.getDb().getCollection(Stat.collectionName).deleteMany(new BasicDBObject());
     }
+
+ */
 }
