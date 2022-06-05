@@ -5,6 +5,7 @@ import com.gioia.mutantesyhumanoskotlin.config.PropertiesReader
 import com.gioia.mutantesyhumanoskotlin.config.Property
 import com.gioia.mutantesyhumanoskotlin.config.di
 import com.gioia.mutantesyhumanoskotlin.utils.Path.*
+import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
@@ -20,18 +21,21 @@ fun main() {
     initializeApp()
 }
 
+private val apiRestController: ApiRestController by di.instance()
+
+val app: HttpHandler = routes(
+    MUTANT.value bind POST to { request: Request-> apiRestController.processMutantPost(request)},
+    STATS.value bind Method.GET to {apiRestController.processStats()},
+    INDEX.value bind Method.GET to {Response(OK).body("")},
+)
+
 /**
  * Inicializa el servidor y mapea rutas a recursos.
  */
 fun initializeApp() {
-    val apiRestController: ApiRestController by di.instance()
     val serverPort = PropertiesReader.getProperty(Property.SERVER_PORT.value)?.toInt() ?: 5000
 
-    routes(
-        MUTANT.value bind POST to { request: Request-> apiRestController.processMutantPost(request)},
-        STATS.value bind Method.GET to {apiRestController.processStats()},
-        INDEX.value bind Method.GET to {Response(OK).body("")},
-    )
+     app
     .asServer(Jetty(serverPort))
     .start()
 }

@@ -15,6 +15,8 @@ class ApiRestService(
 	private val mongoDatabase: MongoDatabase
 ): ApiService{
 	private var logger = LoggerFactory.getLogger(ApiRestService::class.java)
+	private val validInputRegex = "^([ATCG]+)$"
+	private val pattern = Pattern.compile(validInputRegex)
 
 	override fun validateDnaReceived(dna: Array<String>?){
 		if(dna.isNullOrEmpty()){
@@ -22,16 +24,11 @@ class ApiRestService(
 		}
 
 		//Se verifica por cada fila si corresponde con las letras indicadas.
-		dna.forEach{
-			if (!Pattern.compile(validInputRegex()).matcher(it).matches()) {
+		dna.forEach{it: String?->
+			if (it == null || !pattern.matcher(it).matches()) {
 				throw RestMutantValidationException("El siguiente adn es inválido: $it")
 			}
 		}
-	}
-
-	override fun validInputRegex(): String{
-		// De principio a fin, sólo se permite A, o T, o C, o G; una o más veces.
-		return "^([ATCG]{1,})$"
 	}
 
 	override fun saveDnaReceived(dnaObject: Array<String>, isMutant: Boolean){

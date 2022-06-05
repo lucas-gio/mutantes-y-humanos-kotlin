@@ -12,11 +12,6 @@ interface ApiService {
 	 */
 	fun validateDnaReceived(dna: Array<String>?)
 
-	/*
-	* Expresión regular que debe cumplirse en el ingreso de datos de adn.
-	*/
-	fun validInputRegex(): String
-
 	/**
 	 * Almacena el adn recibido en la base de datos.
 	 * @param dnaObject El array de adn a almacenar.

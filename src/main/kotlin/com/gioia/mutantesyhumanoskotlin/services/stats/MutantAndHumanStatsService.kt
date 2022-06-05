@@ -4,7 +4,6 @@ import com.gioia.mutantesyhumanoskotlin.domain.MutantAndHumanStat
 import com.gioia.mutantesyhumanoskotlin.domain.Stat
 import com.mongodb.client.MongoDatabase
 import com.mongodb.client.model.Filters.eq
-import org.bson.Document
 import org.slf4j.LoggerFactory
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -16,22 +15,16 @@ class MutantAndHumanStatsService(
 
 	override fun getJsonStats(): String{
 		try {
-			val statCountersList = mongoDatabase
+			val statistics = mongoDatabase
 				.getCollection(Stat.collectionName)
 				.find(
 					eq(Stat.fieldId, Stat.id)
 				)
+				.limit(1)
 				.first()
 
-			val statCounters: Document
-			var mutantCount = 0
-			var humanCount = 0
-
-			if(statCountersList?.iterator()?.hasNext() == true){
-				statCounters = statCountersList.iterator().next() as Document
-				mutantCount = statCounters.getInteger(Stat.fieldMutantsQuantity, 0)
-				humanCount = statCounters.getInteger(Stat.fieldHumansQuantity, 0)
-			}
+			val mutantCount = (statistics?.get(Stat.fieldMutantsQuantity) ?: 0) as Int
+			val humanCount = (statistics?.get(Stat.fieldHumansQuantity) ?: 0) as Int
 
 			var ratio = BigDecimal(mutantCount)
 
