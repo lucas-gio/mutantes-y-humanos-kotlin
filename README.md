@@ -1,4 +1,6 @@
-
+[![build](https://github.com/lucas-gio/mutantes-y-humanos-kotlin/actions/workflows/build.yml/badge.svg)](https://github.com/lucas-gio/mutantes-y-humanos-kotlin/actions/workflows/build.yml)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=lucas-gio_mutantes-y-humanos-kotlin&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=lucas-gio_mutantes-y-humanos-kotlin)
+[![Discussion](https://img.shields.io/badge/chat-Discussion-blueviolet)](https://github.com/lucas-gio/mutantes-y-humanos-kotlin/discussions)
 
 # Mutantes y Humanos Kotlin - Lucas-Gioia
 Sistema de procesamiento de adn de mutantes y humanos, reescrita en kotlin [de la original realizada para mercadolibre en java](https://github.com/lucas-gio/mutantes-y-humanos).
