@@ -8,9 +8,9 @@ plugins {
 
 sonarqube {
   properties {
-    property "sonar.projectKey", "lucas-gio_mutantes-y-humanos-kotlin"
-    property "sonar.organization", "lucas-gio"
-    property "sonar.host.url", "https://sonarcloud.io"
+    property("sonar.projectKey", "lucas-gio_mutantes-y-humanos-kotlin")
+    property("sonar.organization", "lucas-gio")
+    property("sonar.host.url", "https://sonarcloud.io")
   }
 }
 
