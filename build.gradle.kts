@@ -3,6 +3,15 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     kotlin("jvm") version "1.6.21"
     kotlin("plugin.spring") version "1.6.21"
+    id("org.sonarqube") version "3.3"
+}
+
+sonarqube {
+  properties {
+    property "sonar.projectKey", "lucas-gio_mutantes-y-humanos-kotlin"
+    property "sonar.organization", "lucas-gio"
+    property "sonar.host.url", "https://sonarcloud.io"
+  }
 }
 
 group = "com.gioia"
