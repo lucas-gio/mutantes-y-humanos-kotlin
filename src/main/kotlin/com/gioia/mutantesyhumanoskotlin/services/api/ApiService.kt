@@ -10,7 +10,7 @@ interface ApiService {
 	 * no ser válido el ingreso.
 	 * @param dna El array de adn a verificar.
 	 */
-	fun validateDnaReceived(dna: Array<String>?)
+	fun validateDnaReceived(dna: Array<String?>?)
 
 	/**
 	 * Almacena el adn recibido en la base de datos.
