@@ -11,10 +11,10 @@ Sistema de procesamiento de adn de mutantes y humanos, reescrita en kotlin [de l
 [Requerimiento para realizar el sistema](https://github.com/lucas-gio/mutantes-y-humanos-kotlin/blob/main/documentation/Examen%20Mercadolibre%202020%20-%20Mutantes.pdf)
 
 # EndPoints rest: 
-| Método | Endpoint | Detalle                                         |
-|--------|----------|-------------------------------------------------|
-| POST   | /mutant  | Procesa el adn enviado en el cuerpo del mensaje |
-| GET    | /stats   | Obtiene las estadísticas de los adn enviados    |
+| Método | Endpoint | Detalle |
+| ------ | ------ | ------ |
+| POST | /mutant |  Procesa el adn enviado en el cuerpo del mensaje |
+| GET | /stats |  Obtiene las estadísticas de los adn enviados |
 
 ## POST /mutant: Envío de adn
 
@@ -56,16 +56,16 @@ Para compilar el sistema, se debe situarse en la carpeta del proyecto, y luego e
 
 ## Configuraciones disponibles
 
-| Nombre                    | Descripción                                                  | Valor por defecto        |
-|---------------------------|--------------------------------------------------------------|--------------------------|
-| mongoHost                 | El host donde reside mongodb                                 | localhost                |
-| mongoDatabaseName         | El nombre de la base de datos                                | mutantApp                |
-| mongoUser                 | El usuario de la base de datos                               | (por defecto no utiliza) |
-| mongoPassword             | La contraseña de la base de datos                            | (por defecto no utiliza) |
-| mongoTimeout              | Tiempo de espera para conectar a mongodb                     | 30000 ms                 |
-| mongoMinConnectionPerHost | Cantidad de conexiones mínimas que tendrá el pool de mongodb | 10                       |
-| mongoMaxConnectionPerHost | Cantidad de conexiones máximo que tendrá el pool de mongodb  | 2990                     |
-| serverPort                | Puerto en que estará disponible la aplicación                | 5000                     |
+| Nombre | Descripción | Valor por defecto |
+| ------ | ------ | ------ |
+| mongoHost | El host donde reside mongodb | localhost |
+| mongoDatabaseName | El nombre de la base de datos | mutantApp |
+| mongoUser | El usuario de la base de datos | (por defecto no utiliza) |
+| mongoPassword | La contraseña de la base de datos | (por defecto no utiliza) |
+| mongoTimeout | Tiempo de espera para conectar a mongodb | 30000 ms |
+| mongoMinConnectionPerHost | Cantidad de conexiones mínimas que tendrá el pool de mongodb | 10 |
+| mongoMaxConnectionPerHost | Cantidad de conexiones máximo que tendrá el pool de mongodb | 2990 |
+| serverPort | Puerto en que estará disponible la aplicación | 5000 |
 
 ## Tecnologías aplicadas
 - [Kodein DI](https://kodein.org/di/) - Inyección de dependencias

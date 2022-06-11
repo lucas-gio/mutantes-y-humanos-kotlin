@@ -18,13 +18,13 @@ class ApiRestService(
 	private val validInputRegex = "^([ATCG]+)$"
 	private val pattern = Pattern.compile(validInputRegex)
 
-	override fun validateDnaReceived(dna: Array<String?>?){
+	override fun validateDnaReceived(dna: Array<String>?){
 		if(dna.isNullOrEmpty()){
 			throw RestMutantValidationException("El listado de adn a verificar se encuentra vacío.")
 		}
 
 		//Se verifica por cada fila si corresponde con las letras indicadas.
-		dna.forEach{
+		dna.forEach{it: String?->
 			if (it == null || !pattern.matcher(it).matches()) {
 				throw RestMutantValidationException("El siguiente adn es inválido: $it")
 			}
