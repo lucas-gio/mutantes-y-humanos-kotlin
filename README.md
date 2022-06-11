@@ -3,7 +3,7 @@
 [![Discussion](https://img.shields.io/badge/chat-Discussion-blueviolet)](https://github.com/lucas-gio/mutantes-y-humanos-kotlin/discussions)
 
 # Mutantes y Humanos Kotlin - Lucas-Gioia
-Sistema de procesamiento de adn de mutantes y humanos, reescrita en kotlin [de la original realizada para mercadolibre en java](https://github.com/lucas-gio/mutantes-y-humanos).
+Sistema de procesamiento de adn de mutantes y humanos, reescrita en kotlin [de la original realizada como examen de ingreso para mercadolibre en java](https://github.com/lucas-gio/mutantes-y-humanos).
 
 # Requerimiento:
 [Requerimiento para realizar el sistema](https://github.com/lucas-gio/mutantes-y-humanos-kotlin/blob/main/documentation/Examen%20Mercadolibre%202020%20-%20Mutantes.pdf)
