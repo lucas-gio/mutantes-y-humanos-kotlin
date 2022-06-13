@@ -120,13 +120,13 @@ class MutantVerificationService: MutantService {
             val columnsQuantity = dnaArray.first().length
 
             // Por cada columna de derecha a izquierda
-            for (column in (columnsQuantity - 1) downTo 0) {
+            for (column in columnsQuantity - 1 downTo 0) {
                 diagonalResult = StringBuffer()
 
                 // Por cada fila, de arriba hacia abajo
                 for (row in 0 until rowsQuantity) {
-                    if ((column + row) < columnsQuantity) {
-                        diagonalResult.append(dnaArray[row][(column + row)])
+                    if (column + row < columnsQuantity) {
+                        diagonalResult.append(dnaArray[row][column + row])
                     } else {
                         break
                     }
@@ -149,7 +149,7 @@ class MutantVerificationService: MutantService {
                 var j = i
                 var columna = 0
 
-                while (((j < rowsQuantity) && (columna < columnsQuantity))){
+                while (j < rowsQuantity && columna < columnsQuantity){
                     diagonalResult.append(dnaArray[j][columna])
                     j++
                     columna++
