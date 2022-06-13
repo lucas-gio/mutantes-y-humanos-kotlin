@@ -63,7 +63,7 @@ class ApiRestService(
 				.getCollection(Stat.collectionName)
 				.updateOne(
 					Filters.eq(Stat.fieldId, Stat.id),
-					Updates.inc((if(isMutant) Stat.fieldMutantsQuantity else Stat.fieldHumansQuantity), 1),
+					Updates.inc(if(isMutant) Stat.fieldMutantsQuantity else Stat.fieldHumansQuantity, 1),
 					UpdateOptions().upsert(true)
 				)
 		}
